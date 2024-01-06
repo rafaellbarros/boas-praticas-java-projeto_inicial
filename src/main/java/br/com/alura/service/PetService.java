@@ -1,6 +1,7 @@
 package br.com.alura.service;
 
 import br.com.alura.client.ClientHttpConfiguration;
+import br.com.alura.domain.Pet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,7 +26,6 @@ public class PetService {
         System.out.println("Digite o id ou nome do abrigo:");
         String idOuNome = new Scanner(System.in).nextLine();
 
-        HttpClient client = HttpClient.newHttpClient();
         String uri = "http://localhost:8080/abrigos/" +idOuNome +"/pets";
         HttpResponse<String> response = this.client.dispararRequisicaoGet(uri);
         int statusCode = response.statusCode();
@@ -69,26 +69,19 @@ public class PetService {
             String cor = campos[4];
             Float peso = Float.parseFloat(campos[5]);
 
-            JsonObject json = new JsonObject();
-            json.addProperty("tipo", tipo.toUpperCase());
-            json.addProperty("nome", nome);
-            json.addProperty("raca", raca);
-            json.addProperty("idade", idade);
-            json.addProperty("cor", cor);
-            json.addProperty("peso", peso);
+            final Pet pet = new Pet(tipo, nome, raca, idade, cor, peso);
 
-            HttpClient client = HttpClient.newHttpClient();
             String uri = "http://localhost:8080/abrigos/" + idOuNome + "/pets";
-            HttpResponse<String> response = this.client.dispararRequisicaoPost(uri, json);
+            HttpResponse<String> response = this.client.dispararRequisicaoPost(uri, pet);
             int statusCode = response.statusCode();
             String responseBody = response.body();
             if (statusCode == 200) {
-                System.out.println("Pet cadastrado com sucesso: " + nome);
+                System.out.println("Pet cadastrado com sucesso: " + pet.getNome());
             } else if (statusCode == 404) {
                 System.out.println("Id ou nome do abrigo não encontado!");
                 break;
             } else if (statusCode == 400 || statusCode == 500) {
-                System.out.println("Erro ao cadastrar o pet: " + nome);
+                System.out.println("Erro ao cadastrar o pet: " + pet.getNome());
                 System.out.println(responseBody);
                 break;
             }
